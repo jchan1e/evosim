@@ -72,9 +72,9 @@ SDL_GLContext context;
 
 //Timing
 int ff = 32; //milliseconds per frame
-int r = 0;
-int dr = 0;
-int oldr = 0;
+int t_r = 0;
+int t_dr = 0;
+int t_oldr = 0;
 int Pause = 1;
 int frames = 0;
 bool reverse = false;
@@ -205,13 +205,18 @@ void display()
     //emission[0] = -0.05; emission[1] = -0.05; emission[2] = -0.05;
     //glMaterialfv(GL_FRONT, GL_EMISSION, emission);
 
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(0, 1);
+
     glBegin(GL_QUADS);
     glColor3f(0.0, 0.0, 0.0);
-    glVertex3f(-n_boardsize/2.0-0.5, -0.25, -n_boardsize/2.0-0.5);
-    glVertex3f(-n_boardsize/2.0-0.5, -0.25,  n_boardsize/2.0+0.5);
-    glVertex3f( n_boardsize/2.0+0.5, -0.25,  n_boardsize/2.0+0.5);
-    glVertex3f( n_boardsize/2.0+0.5, -0.25, -n_boardsize/2.0-0.5);
+    glVertex3f(-n_boardsize/2.0-0.5, -0.001, -n_boardsize/2.0-0.5);
+    glVertex3f(-n_boardsize/2.0-0.5, -0.001,  n_boardsize/2.0+0.5);
+    glVertex3f( n_boardsize/2.0+0.5, -0.001,  n_boardsize/2.0+0.5);
+    glVertex3f( n_boardsize/2.0+0.5, -0.001, -n_boardsize/2.0-0.5);
     glEnd();
+
+    glDisable(GL_POLYGON_OFFSET_FILL);
 
     // Wireframe
     //glBegin(GL_LINES);
@@ -226,15 +231,15 @@ void display()
         float y = 0.0;
         float z = j-n_boardsize/2;
 
-        float r = 0.45;
-        float g = 0.45;
-        float b = 0.45;
+        float r = 0.5;
+        float g = 0.5;
+        float b = 0.4;
 
         if (plant == 1)
         {
           r = 0.9;
-          g = 0.9;
-          b = 0.0;
+          g = 0.8;
+          b = 0.2;
         }
         else if (plant == 2)
         {
@@ -244,13 +249,13 @@ void display()
         }
         else if (plant >= 3)
         {
-          r = 0.4;
+          r = 0.5;
           g = 0.7;
           b = 0.1;
         }
 
-        glBegin(GL_QUADS);
         glColor3f(r,g,b);
+        glBegin(GL_QUADS);
         glVertex3f(x-0.48, 0.0, z-0.48);
         glVertex3f(x-0.48, 0.0, z+0.48);
         glVertex3f(x+0.48, 0.0, z+0.48);
@@ -279,7 +284,7 @@ void display()
             y = 0.625;
             glPushMatrix();
             glScalef(0.125, y, 0.125);
-            glColor3f(0.25, 0.2, 0.1);
+            glColor3f(0.30, 0.25, 0.15);
             cube(x/0.125, 0.5, z/0.125, 0, y);
             glPopMatrix();
             glColor3f(0.25, 0.5, 0.0);
@@ -290,7 +295,7 @@ void display()
             y = 0.75;
             glPushMatrix();
             glScalef(0.1875, y, 0.1875);
-            glColor3f(0.25, 0.2, 0.1);
+            glColor3f(0.30, 0.25, 0.15);
             cube(x/0.1875, 0.5, z/0.1875, 0, y);
             glPopMatrix();
             glColor3f(0.25, 0.5, 0.0);
@@ -301,7 +306,7 @@ void display()
             y = 0.875;
             glPushMatrix();
             glScalef(0.25, y, 0.25);
-            glColor3f(0.25, 0.2, 0.1);
+            glColor3f(0.30, 0.25, 0.15);
             cube(x/0.25, 0.5, z/0.25, 0, y);
             glPopMatrix();
             glColor3f(0.25, 0.5, 0.0);
@@ -313,6 +318,7 @@ void display()
 
         //cout << x << "\t" << y << "\t" << z << endl;
         //ball(x,y,z, 0.5);
+        glColor3f(0.1,0.1,0.1);
       }
     }
     //cout << endl;
@@ -592,20 +598,20 @@ int main(int argc, char *argv[])
         handleEvents();
 
         //// PHYSICS TIMING ////
-        r = SDL_GetTicks();
-        dr += r - oldr;
-        while (dr >= ff)
+        t_r = SDL_GetTicks();
+        t_dr += t_r - t_oldr;
+        while (t_dr >= ff)
         {
             physics();
-            dr -= ff;
+            t_dr -= ff;
         }
-        oldr = r;
+        t_oldr = t_r;
         display();
         frames += 1;
     }
 
     cout << "Shutting Down\n";
-    cout << "average framerate: " << 1000*(float)frames/(r - startuptime) << endl;
+    cout << "average framerate: " << 1000*(float)frames/(t_r - startuptime) << endl;
 
     W->grid[0] = tmp_grid_0;
     W->grid[1] = tmp_grid_1;
