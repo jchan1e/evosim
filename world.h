@@ -85,17 +85,17 @@ public:
       }
     }
   }
-  void update_plants(int input) {
-    for (int i=0; i < gridsize; ++i) {
-      for (int j=0; j < gridsize; ++j) {
-        //Cell* C = &grid[ping][i][j];
-        Cell* C_1 = &grid[pong][i][j];
-        C_1->plant = ((i+j)/2)%10;
-      }
-    }
-    ping = pong;
-    pong = 1 - pong;
-  }
+//  void update_plants(int input) {
+//    for (int i=0; i < gridsize; ++i) {
+//      for (int j=0; j < gridsize; ++j) {
+//        //Cell* C = &grid[ping][i][j];
+//        Cell* C_1 = &grid[pong][i][j];
+//        C_1->plant = ((i+j)/2)%10;
+//      }
+//    }
+//    ping = pong;
+//    pong = 1 - pong;
+//  }
 
   void update_plants() {
     for (int i=0; i < gridsize; ++i) {

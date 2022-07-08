@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
   file.write((char*)&n_boardsize, sizeof(int));
   file.write((char*)&n_steps, sizeof(int));
   for (int i=0; i < n_boardsize; ++i) {
-    file.write((char*)W->grid[i], n_boardsize*sizeof(Cell));
+    file.write((char*)W->grid[W->ping][i], n_boardsize*sizeof(Cell));
   }
 
   // run the simulation

@@ -57,7 +57,7 @@ vis:vis.o objects.o
 #Test:test.o sim vis
 #	g++ -g -O3 -o Test $^ $(GLIBS)
 #
-#test:FORCE Test 
+#test:FORCE Test
 #	./Test
 
 FORCE:
