@@ -56,6 +56,7 @@ float Ambient[4];
 float Diffuse[4];
 float Specular[4];
 float shininess[1];
+float dullness[1];
 float LightPos[4];
 float ltheta = 0.0;
 
@@ -168,6 +169,7 @@ void display()
     Diffuse[0] = 0.65; Diffuse[1] = 0.65; Diffuse[2] = 0.60; Diffuse[3] = 1.0;
     Specular[0] = 0.9; Specular[1] = 0.9; Specular[2] = 0.7; Specular[3] = 1.0;
     shininess[0] = 512;
+    dullness[0] = 16;
 
     // normally normalize normals
     glEnable(GL_NORMALIZE);
@@ -192,6 +194,7 @@ void display()
     ///////////////////////////
 
     float white[] = {1.0, 1.0, 1.0, 1.0};
+    float nonwhite[] = {0.1, 0.1, 0.0, 1.0};
     float emission[] = {0.0, 0.0, 0.0, 1.0};
 
     glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
@@ -206,14 +209,15 @@ void display()
     //glMaterialfv(GL_FRONT, GL_EMISSION, emission);
 
     glEnable(GL_POLYGON_OFFSET_FILL);
-    glPolygonOffset(0, 1);
+    glPolygonOffset(1, 1);
 
+    glColor3f(0.1, 0.1, 0.1);
     glBegin(GL_QUADS);
-    glColor3f(0.0, 0.0, 0.0);
-    glVertex3f(-n_boardsize/2.0-0.5, -0.001, -n_boardsize/2.0-0.5);
-    glVertex3f(-n_boardsize/2.0-0.5, -0.001,  n_boardsize/2.0+0.5);
-    glVertex3f( n_boardsize/2.0+0.5, -0.001,  n_boardsize/2.0+0.5);
-    glVertex3f( n_boardsize/2.0+0.5, -0.001, -n_boardsize/2.0-0.5);
+    glNormal3f(0,1,0);
+    glVertex3f(-n_boardsize/2.0-1.5, -0.0, -n_boardsize/2.0-1.5);
+    glVertex3f(-n_boardsize/2.0-1.5, -0.0,  n_boardsize/2.0+0.5);
+    glVertex3f( n_boardsize/2.0+0.5, -0.0,  n_boardsize/2.0+0.5);
+    glVertex3f( n_boardsize/2.0+0.5, -0.0, -n_boardsize/2.0-1.5);
     glEnd();
 
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -239,22 +243,32 @@ void display()
         {
           r = 0.9;
           g = 0.8;
-          b = 0.2;
+          b = 0.3;
         }
         else if (plant == 2)
         {
-          r = 0.7;
+          r = 0.75;
           g = 0.8;
-          b = 0.1;
+          b = 0.2;
         }
         else if (plant >= 3)
         {
-          r = 0.5;
-          g = 0.7;
+          r = 0.6;
+          g = 0.8;
           b = 0.1;
         }
 
+        if (plant > 0) {
+          glMaterialfv(GL_FRONT, GL_SPECULAR, nonwhite);
+          glMaterialfv(GL_FRONT, GL_SHININESS, dullness);
+        }
+        else {
+          glMaterialfv(GL_FRONT, GL_SPECULAR, white);
+          glMaterialfv(GL_FRONT, GL_SHININESS, shininess);
+        }
+
         glColor3f(r,g,b);
+        glNormal3f(0,1,0);
         glBegin(GL_QUADS);
         glVertex3f(x-0.48, 0.0, z-0.48);
         glVertex3f(x-0.48, 0.0, z+0.48);
@@ -266,12 +280,12 @@ void display()
         {
           if (plant == 4)
           {
-            glColor3f(0.3, 0.6, 0.05);
+            glColor3f(0.4, 0.6, 0.05);
             cube(x, y, z, 0, 0.25);
           }
           else if (plant == 5)
           {
-            glColor3f(0.3, 0.6, 0.05);
+            glColor3f(0.35, 0.6, 0.05);
             cube(x, y, z, 0, 0.3125);
           }
           else if (plant == 6)
@@ -283,34 +297,34 @@ void display()
           {
             y = 0.625;
             glPushMatrix();
-            glScalef(0.125, y, 0.125);
+            glScalef(0.125, 0.5, 0.125);
             glColor3f(0.30, 0.25, 0.15);
-            cube(x/0.125, 0.5, z/0.125, 0, y);
+            cube(x/0.125, y, z/0.125, 0, y);
             glPopMatrix();
-            glColor3f(0.25, 0.5, 0.0);
-            cube(x, y, z, 0, 0.25);
+            glColor3f(0.35, 0.5, 0.0);
+            cube(x, y*1.25, z, 0, 0.25);
           }
           else if (plant == 8)
           {
-            y = 0.75;
+            y = 0.8125;
             glPushMatrix();
-            glScalef(0.1875, y, 0.1875);
+            glScalef(0.15625, 0.5, 0.15625);
             glColor3f(0.30, 0.25, 0.15);
-            cube(x/0.1875, 0.5, z/0.1875, 0, y);
+            cube(x/0.15625, y, z/0.15625, 0, y);
             glPopMatrix();
-            glColor3f(0.25, 0.5, 0.0);
-            cube(x, y, z, 0, 0.3125);
+            glColor3f(0.30, 0.5, 0.0);
+            cube(x, y*1.25, z, 0, 0.3125);
           }
           else if (plant == 9)
           {
-            y = 0.875;
+            y = 1.0;
             glPushMatrix();
-            glScalef(0.25, y, 0.25);
+            glScalef(0.1875, 0.5, 0.1875);
             glColor3f(0.30, 0.25, 0.15);
-            cube(x/0.25, 0.5, z/0.25, 0, y);
+            cube(x/0.1875, y, z/0.1875, 0, y);
             glPopMatrix();
             glColor3f(0.25, 0.5, 0.0);
-            cube(x, y, z, 0, 0.4375);
+            cube(x, y*1.25, z, 0, 0.4375);
           }
           //else
           //  cout << "this code should not run (plant >9): (" << i << ", " << j << ")\t" << plant << endl;
@@ -318,7 +332,7 @@ void display()
 
         //cout << x << "\t" << y << "\t" << z << endl;
         //ball(x,y,z, 0.5);
-        glColor3f(0.1,0.1,0.1);
+        //glColor3f(0.1,0.1,0.1);
       }
     }
     //cout << endl;
@@ -549,14 +563,14 @@ int main(int argc, char *argv[])
         sim[i][j] = new Cell[n_boardsize];
         file.seekg(2*sizeof(int) + n_boardsize*n_boardsize*i*sizeof(Cell) + n_boardsize*j*sizeof(Cell));
         file.read((char*)sim[i][j], n_boardsize*sizeof(Cell));
-        if (i <= 3) {
-        for (int k=0; k < n_boardsize; ++k) {
-          cout << sim[i][j][k].plant << " ";
-        }
-        cout << endl;
-        }
+        //if (i <= 3) {
+        //for (int k=0; k < n_boardsize; ++k) {
+        //  cout << sim[i][j][k].plant << " ";
+        //}
+        //cout << endl;
+        //}
       }
-      if (i <= 3) cout << endl;
+      //if (i <= 3) cout << endl;
     }
     Cell **tmp_grid_0 = W->grid[0];
     Cell **tmp_grid_1 = W->grid[1];
@@ -586,7 +600,7 @@ int main(int argc, char *argv[])
 
     reshape(w,h);
 
-    LightPos[0] = 0.0; LightPos[1] = 8.0; LightPos[2] = 4.5; LightPos[3] = 1.0;
+    LightPos[0] = 50.0; LightPos[1] = 50.0; LightPos[2] = 50.0; LightPos[3] = 1.0;
 
     int startuptime = SDL_GetTicks();
 
