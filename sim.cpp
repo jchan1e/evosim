@@ -54,7 +54,7 @@ int main(int argc, char *argv[])
   for (int frame=1; frame < n_steps; ++frame) {
     // update creatures
     // update plants
-    W->update_plants(0);
+    W->update_plants();
     // write output as we go
     W->save(&file);
   }
