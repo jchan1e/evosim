@@ -48,8 +48,7 @@ text.o:text.cpp text.h stdGL.h
 
 #  link
 sim:sim.o
-	g++ -g -o sim $^ #$(GLIBS)
-	#g++ -g -O3 -o sim $^ $(GLIBS) -lSDL2_ttf
+	g++ -g -o sim $^
 
 vis:vis.o objects.o
 	g++ -g -o vis $^ $(GLIBS)
