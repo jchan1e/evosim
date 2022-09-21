@@ -47,7 +47,7 @@ struct Brain {
   // outputs: float value normalized by tanh
   //          [0.2, 0.8] treated as probability
   //          [0.0, 0.2] and [0.8, 1.0] rounded to 0 and 1
-  // 0 set oscillator frequency [0.0, 1.0] -> [2, 60] frames per rev
+  // 0 set oscillator period [0.0, 1.0] -> [2, 60] frames per rev
   // 1 eat plant (front)
   // 2 move random
   // 3 move forward
@@ -83,6 +83,7 @@ public:
       int I = C.input;
       int O = C.output;
       float S = C.strength;
+      // if I or O < 0, then it refers to a hidden layer neuron rather than a sensor or action
       if (I < 0) {
         I = -I - 1;
         in_arr = &neurons[0];
@@ -104,14 +105,27 @@ public:
   int d_x, d_y;
   float energy;
 
-  Creature(World* W, float* genome) {
+  Creature(World* W, float* genome, int num_conns) {
     w = W;
     //brain = B;
+    // biases first
+    for (int i=0; i < 3; ++i) {
+      brain.b_neurons[i] = genome[i];
+    }
+    for (int i=0; i < 10; ++i) {
+      brain.b_actions[i] = genome[3+i];
+    }
+    for (int i=0; i < num_conns; ++i) {
+      int I = int(genome[13+3*i]);
+      int O = int(genome[13+3*i+1]);
+      float V = genome[13+3*i+2];
+      brain.conns.push_back(Connection(I,O,V));
+    }
     energy = 100.0;
     // everything else roll randomly
   }
 
-  Creature(World* W, int X, int Y, int D_X, int D_Y, float E, float* genome) {
+  Creature(World* W, int X, int Y, int D_X, int D_Y, float E, float* genome, int len_genome) {
     w = W;
     x = X;
     y = Y;
@@ -119,6 +133,13 @@ public:
     d_y = D_Y;
     energy = E;
     //brain = B;
+    for (int i=0; i < len_genome; ++i) {
+      int I = int(genome[3*i]);
+      int O = int(genome[3*i+1]);
+      float V = genome[3*i+2];
+      brain.conns.push_back(Connection(I,O,V));
+    }
+    energy = 100.0;
   }
 
   ~Creature() {
