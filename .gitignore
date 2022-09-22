@@ -33,3 +33,6 @@
 sim
 vis
 *.sim
+
+.vimrc*
+simulations*
