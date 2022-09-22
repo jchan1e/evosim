@@ -43,7 +43,7 @@ struct Brain {
   // 15 population density
   // 16 population gradient front
   // 17 population gradient left/right
-  // 
+  //
   // outputs: float value normalized by tanh
   //          [0.2, 0.8] treated as probability
   //          [0.0, 0.2] and [0.8, 1.0] rounded to 0 and 1
@@ -103,10 +103,17 @@ public:
   Brain brain;
   int x, y;
   int d_x, d_y;
+  int direction;
   float energy;
+  int ID = 0;
 
   Creature(World* W, float* genome, int num_conns) {
     w = W;
+    energy = 100.0;
+    x = rand()%W->gridsize;
+    y = rand()%W->gridsize;
+    direction = rand()%8;
+    set_dir();
     //brain = B;
     // biases first
     for (int i=0; i < 3; ++i) {
@@ -121,8 +128,6 @@ public:
       float V = genome[13+3*i+2];
       brain.conns.push_back(Connection(I,O,V));
     }
-    energy = 100.0;
-    // everything else roll randomly
   }
 
   Creature(World* W, int X, int Y, int D_X, int D_Y, float E, float* genome, int len_genome) {
@@ -139,14 +144,169 @@ public:
       float V = genome[3*i+2];
       brain.conns.push_back(Connection(I,O,V));
     }
-    energy = 100.0;
   }
 
-  ~Creature() {
-    // clean up pointers and whatnot
+  //~Creature() {
+  //  // clean up pointers and whatnot
+  //}
+
+  void set_dir() {
+    switch(direction) {
+      case 0:
+        d_x = 0;
+        d_y = 1;
+        break;
+      case 1:
+        d_x = 1;
+        d_y = 1;
+        break;
+      case 2:
+        d_x = 1;
+        d_y = 0;
+        break;
+      case 3:
+        d_x = 1;
+        d_y = -1;
+        break;
+      case 4:
+        d_x = 0;
+        d_y = -1;
+        break;
+      case 5:
+        d_x = -1;
+        d_y = -1;
+        break;
+      case 6:
+        d_x = -1;
+        d_y = 0;
+        break;
+      case 7:
+        d_x = -1;
+        d_y = 1;
+        break;
+      default:
+        d_x = 0;
+        d_y = 1;
+        break;
+    }
   }
 
-  void move_f() {
+
+  void eat_plant(int t_x, int t_y) {
+    if (abs(t_x-x) <= 1 && abs(t_y-y) <= 1 && w->grid[1][x][y].plant > 0) {
+      w->grid[1][x][y].plant -= 1;
+      energy += 10.0;
+    }
+  }
+
+  void move_random() {
+    int dir = rand()%4;
+    switch(dir) {
+      case 0:
+        move_forward();
+        break;
+      case 1:
+        move_reverse();
+        break;
+      case 2:
+        move_left();
+        break;
+      case 3:
+        move_right();
+        break;
+    }
+  }
+
+  void move_forward() {
+    if (0 < x+d_x && x+d_x < w->gridsize
+     && 0 < y+d_y && y+d_y < w->gridsize
+     && w->grid[1][x+d_x][y+d_y].creature_id == -1) {
+      w->grid[1][x+d_x][y+d_y].creature_id = ID;
+      w->grid[1][x][y].creature_id = -1;
+      x += d_x;
+      y += d_y;
+    }
+  }
+
+  void move_reverse() {
+    d_x = -d_x;
+    d_y = -d_y;
+    move_forward();
+    d_x = -d_x;
+    d_y = -d_y;
+  }
+
+  void move_left() {
+    direction = (direction+8-2)%8;
+    set_dir();
+    move_forward();
+    direction = (direction+8+2)%8;
+    set_dir();
+  }
+
+  void move_right() {
+    direction = (direction+8+2)%8;
+    set_dir();
+    move_forward();
+    direction = (direction+8-2)%8;
+    set_dir();
+  }
+
+  void rotate_left() {
+    direction = (direction+8-1)%8;
+    set_dir();
+  }
+
+  void rotate_right() {
+    direction = (direction+8+1)%8;
+    set_dir();
+  }
+
+  void advance() {
+    brain.eval();
+    // check brain outputs, determine actions to be taken
+    // 0 set oscillator period [0.0, 1.0] -> [2, 60] frames per rev
+    // 1 eat plant (front)
+    // 2 move random
+    // 3 move forward
+    // 4 move reverse
+    // 5 move left
+    // 6 move right
+    // 7 rotate left
+    // 8 rotate right
+
+    // Find highest resulting element
+    int action_id = 1;
+    for (int i=2; i < 9; ++i) {
+      if (brain.actions[i] > brain.actions[action_id])
+        action_id = i;
+    }
+    switch(action_id) {
+      case 1:
+        eat_plant(x+d_x,y+d_y);
+        break;
+      case 2:
+        move_random();
+        break;
+      case 3:
+        move_forward();
+        break;
+      case 4:
+        move_reverse();
+        break;
+      case 5:
+        move_left();
+        break;
+      case 6:
+        move_right();
+        break;
+      case 7:
+        rotate_left();
+        break;
+      case 8:
+        rotate_right();
+        break;
+    }
   }
 };
 
