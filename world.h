@@ -27,10 +27,12 @@ class World {
 public:
   Cell** grid[2];
   int gridsize;
-  int ping;
-  int pong;
+  int ping; // read from ping
+  int pong; // write to pong
+  int timestep;
 
   World(int size) {
+    timestep = 0;
     gridsize = size;
     ping = 0;
     pong = 1;
@@ -98,6 +100,14 @@ public:
 //    ping = pong;
 //    pong = 1 - pong;
 //  }
+
+  void advance() {
+    update_plants();
+    //update_creatures();
+
+    ping = pong;
+    pong = 1 - pong;
+  }
 
   void update_plants() {
     for (int i=0; i < gridsize; ++i) {
@@ -236,8 +246,8 @@ public:
           grid[pong][i][j].plant = 9;
       }
     }
-    ping = pong;
-    pong = 1 - pong;
+  //  ping = pong;
+  //  pong = 1 - pong;
   }
 };
 
