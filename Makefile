@@ -46,11 +46,17 @@ text.o:text.cpp text.h stdGL.h
 	g++ -c $(CFLG) $<
 
 
+agent.o:agent.cpp agent.h world.h
+	g++ -c $(CFLG) $<
+
+world.o:world.cpp world.h agent.h
+	g++ -c $(CFLG) $<
+
 #  link
-sim:sim.o
+sim:sim.o agent.o world.o
 	g++ -g -o sim $^
 
-vis:vis.o objects.o
+vis:vis.o agent.o world.o objects.o
 	g++ -g -o vis $^ $(GLIBS)
 
 #Test:test.o sim vis

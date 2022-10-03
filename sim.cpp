@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <sstream>
 
+#include "agent.h"
 #include "world.h"
 
 using namespace std;
@@ -28,8 +29,8 @@ int main(int argc, char *argv[])
   // initialize
   World* W = new World(n_boardsize);
   // randomly seed plants around the board
-  W->grid[0][n_boardsize/2][n_boardsize/2].plant = 3;
-  W->grid[1][n_boardsize/2][n_boardsize/2].plant = 3;
+  W->grid[0][n_boardsize/2][n_boardsize/2].plant = 1;
+  W->grid[1][n_boardsize/2][n_boardsize/2].plant = 1;
   //for (int i=0; i < n_boardsize/2; ++i) {
   //  int x = rand() % n_boardsize;
   //  int y = rand() % n_boardsize;
@@ -52,9 +53,12 @@ int main(int argc, char *argv[])
 
   // run the simulation
   for (int frame=1; frame < n_steps; ++frame) {
-    // update creatures
-    // update plants
-    W->update_plants();
+    //// update creatures
+    //w->update_creatures();
+    //// update plants
+    //W->update_plants();
+    // advance sim statejf
+    W->advance();
     // write output as we go
     W->save(&file);
   }
