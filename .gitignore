@@ -33,6 +33,7 @@
 sim
 vis
 *.sim
+*.gene
 
 .vimrc*
 simulations*
