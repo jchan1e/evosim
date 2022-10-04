@@ -224,14 +224,12 @@ void display()
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
-    // Wireframe
-    //glBegin(GL_LINES);
-    //glEnd();
-
     for (int i=0; i < n_boardsize; i += 1)
     {
       for (int j=0; j < n_boardsize; j += 1)
       {
+        // draw plants
+
         int plant = W->grid[0][i][j].plant;
         float x = i-n_boardsize/2;
         float y = 0.0;
@@ -336,6 +334,24 @@ void display()
         //ball(x,y,z, 0.5);
         //glColor3f(0.1,0.1,0.1);
       }
+    }
+
+    for (Creature C : W->creatures) {
+      // color body by energy
+      float R_e = 0.5;
+      float G_e = 0.5;
+      float B_e = 0.5;
+      // color head by genetics
+      float R_g = 0.7;
+      float G_g = 0.5;
+      float B_g = 0.3;
+
+      // body
+      glColor3f(R_e, G_e, B_e);
+      ball(C.x, C.y, 0.0, 1.0);
+
+      // head
+      // octahedron or cone or something facing forward
     }
     //cout << endl;
 
