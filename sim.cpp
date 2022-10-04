@@ -14,17 +14,17 @@ using namespace std;
 int main(int argc, char *argv[])
 {
   if (argc < 3) {
-    cout << "Usage: sim [boardsize] <population size> <num_steps> <outfilename>.sim\n";
+    cout << "Usage: sim <boardsize> <population size> <num_steps> <outfilename>.sim <genome file 01> ...\n";
     return 0;
   }
 
-  int n_boardsize = 128;
-  if (argc == 5)
-    n_boardsize = atoi(argv[argc-4]);
-  //int n_population = atoii(argv[argc-3]);
+  //int n_boardsize = 128;
+  //if (argc == 5)
+  int n_boardsize = atoi(argv[1]);
+  int n_population = atoi(argv[2]);
   //if (argc >= 4)
   //  n_population = atoi(argv[argc-3]);
-  int n_steps = atoi(argv[argc-2]);
+  int n_steps = atoi(argv[3]);
 
   // initialize
   World* W = new World(n_boardsize);
@@ -38,8 +38,21 @@ int main(int argc, char *argv[])
   //  W->grid[1][x][y].plant = W->grid[0][x][y].plant;
   //}
 
+  // initialize creatures
+  for (int i=0; i < n_population; ++i) {
+    // read file
+    ifstream infile (argv[5+i], ifstream::binary);
+    vector<float> genome;
+    int n_conns = 0;
+    //populate the things
+    // add to world
+    W->add_creature(&genome[0], n_conns);
+
+    infile.close();
+  }
+
   // start outfile
-  ofstream file (argv[argc-1],ios::out|ios::binary);
+  ofstream file (argv[4],ios::out|ios::binary);
   if (!file.is_open()) {
     cerr << "Could not open file: " << argv[argc-1] << endl;
     return 1;
