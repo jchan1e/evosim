@@ -95,7 +95,7 @@ Creature::Creature(World* W, float* genome, int num_conns, int id) {
   }
 }
 
-Creature::Creature(World* W, int X, int Y, int D_X, int D_Y, float E, float* genome, int len_genome, int id) {
+Creature::Creature(World* W, int X, int Y, int D_X, int D_Y, float E, float* genome, int num_comms, int id) {
   w = W;
   x = X;
   y = Y;
@@ -104,7 +104,13 @@ Creature::Creature(World* W, int X, int Y, int D_X, int D_Y, float E, float* gen
   energy = E;
   ID = id;
   //brain = B;
-  for (int i=0; i < len_genome; ++i) {
+  for (int i=0; i < 3; ++i) {
+    brain.b_neurons[i] = genome[i];
+  }
+  for (int i=0; i < 10; ++i) {
+    brain.b_actions[i] = genome[3+i];
+  }
+  for (int i=0; i < num_comms; ++i) {
     int I = int(genome[3*i]);
     int O = int(genome[3*i+1]);
     float V = genome[3*i+2];
