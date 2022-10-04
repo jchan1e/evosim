@@ -45,6 +45,8 @@ vis.o:vis.cpp objects.h stdGL.h world.h
 text.o:text.cpp text.h stdGL.h
 	g++ -c $(CFLG) $<
 
+creature_test.o:creature_test.cpp agent.h world.h
+	g++ -c $(CFLG) $<
 
 agent.o:agent.cpp agent.h world.h
 	g++ -c $(CFLG) $<
@@ -58,6 +60,9 @@ sim:sim.o agent.o world.o
 
 vis:vis.o agent.o world.o objects.o
 	g++ -g -o vis $^ $(GLIBS)
+
+creature_test: creature_test.o agent.o world.o
+	g++ -g -o creature_test $^
 
 #Test:test.o sim vis
 #	g++ -g -O3 -o Test $^ $(GLIBS)

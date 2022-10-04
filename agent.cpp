@@ -50,25 +50,61 @@ void Brain::eval() {
   for (int i=0; i < 10; ++i)
     actions[i] = b_actions[i];
 
+  // hidden neurons first
   for (Connection C : conns) {
-    // propagate in the order the connections are stored
-    float* in_arr = &sensors[0];
-    float* out_arr = &actions[0];
-    int I = C.input;
     int O = C.output;
-    float S = C.strength;
-    // if I or O < 0, then it refers to a hidden layer neuron rather than a sensor or action
-    if (I < 0) {
-      I = -I - 1;
-      in_arr = &neurons[0];
-    }
     if (O < 0) {
+      // propagate in the order the connections are stored
+      float* in_arr = &sensors[0];
+      float* out_arr = &actions[0];
+      int I = C.input;
+      float S = C.strength;
+      // if I or O < 0, then it refers to a hidden layer neuron rather than a sensor or action
+      if (I < 0) {
+        I = -I - 1;
+        in_arr = &neurons[0];
+      }
+      //if (O < 0) {
       O = -O - 1;
       out_arr = &neurons[0];
+      //}
+      out_arr[O] += in_arr[I] * S;
     }
-    out_arr[O] += in_arr[I] * S;
   }
-  osc_freq = min(max(actions[0] * M_PI, 0.0166), 1.0);
+  // activation function tanh
+  for (int i=0; i < 3; ++i) {
+    neurons[i] = tanh(neurons[i]);
+  }
+
+  // output neurons afterward
+  for (Connection C : conns) {
+    int O = C.output;
+    if (O >= 0) {
+      // propagate in the order the connections are stored
+      float* in_arr = &sensors[0];
+      float* out_arr = &actions[0];
+      int I = C.input;
+      float S = C.strength;
+      // if I or O < 0, then it refers to a hidden layer neuron rather than a sensor or action
+      if (I < 0) {
+        I = -I - 1;
+        in_arr = &neurons[0];
+      }
+      //if (O < 0) {
+      //  O = -O - 1;
+      //  out_arr = &neurons[0];
+      //}
+      out_arr[O] += in_arr[I] * S;
+    }
+  }
+  // activation function tanh
+  for (int i=0; i < 10; ++i) {
+    actions[i] = tanh(actions[i]);
+  }
+
+  if (actions[0] > 0.0) {
+    osc_freq = min(max(actions[0] * M_PI, 0.0166), 1.0);
+  }
 }
 
 Creature::Creature(World* W, float* genome, int num_conns, int id) {
@@ -378,6 +414,7 @@ void Creature::advance() {
   // 6 move right
   // 7 rotate left
   // 8 rotate right
+  // 9 attack forward (disabled)
 
   // Find highest value among action neurons
   int action_id = 1;

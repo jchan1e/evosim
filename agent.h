@@ -48,8 +48,7 @@ struct Brain {
   // 17 population gradient left/right
   //
   // outputs: float value normalized by tanh
-  //          [0.2, 0.8] treated as probability
-  //          [0.0, 0.2] and [0.8, 1.0] rounded to 0 and 1
+  //          [0.0, 1.0] treated as probability
   // 0 set oscillator period [0.0, 1.0] -> [2, 60] frames per rev
   // 1 eat plant (front)
   // 2 move random

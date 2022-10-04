@@ -42,9 +42,16 @@ int main(int argc, char *argv[])
   for (int i=0; i < n_population; ++i) {
     // read file
     ifstream infile (argv[5+i], ifstream::binary);
-    vector<float> genome;
     int n_conns = 0;
-    //populate the things
+    infile.seekg(0);
+    infile.read((char*)&n_conns, sizeof(int));
+    float genome[n_conns+13];
+    infile.seekg(sizeof(int));
+    infile.read((char*)&genome[0], 3*sizeof(float));
+    infile.seekg(sizeof(int) + 3*sizeof(float));
+    infile.read((char*)&genome[3], 10*sizeof(float));
+    infile.seekg(sizeof(int) + 13*sizeof(float));
+    infile.read((char*)&genome[13], 3*n_conns*sizeof(float));
     // add to world
     W->add_creature(&genome[0], n_conns);
 
@@ -70,7 +77,7 @@ int main(int argc, char *argv[])
     //w->update_creatures();
     //// update plants
     //W->update_plants();
-    // advance sim statejf
+    // advance sim state
     W->advance();
     // write output as we go
     W->save(&file);
