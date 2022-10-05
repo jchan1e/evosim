@@ -46,7 +46,7 @@ def mate(parent_name1, parent_name2, n_conns):
 
 def main():
     if len(sys.argv) < 3 or len(sys.argv) > 5:
-        print("Usage: python generate_creature.py <num_connections> [parent_1.gene] [parent_2.gene] <child.gene>\n")
+        print("Usage: python generate_creature.py <num_connections> [parent_1.gene] [parent_2.gene] <child.gene>")
         exit(0)
 
     # generate new creature

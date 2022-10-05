@@ -109,6 +109,12 @@ void Brain::eval() {
 
 Creature::Creature() {
   w = NULL;
+  ID = -1;
+  x = 0;
+  y = 0;
+  energy = 0.0;
+  direction = 0;
+  set_dir();
 }
 
 Creature::Creature(World* W, float* genome, int num_conns, int id) {
@@ -230,11 +236,11 @@ void Creature::move_random() {
 }
 
 void Creature::move_forward() {
-  if (0 < x+d_x && x+d_x < w->gridsize
-   && 0 < y+d_y && y+d_y < w->gridsize
-   && w->grid[1][x+d_x][y+d_y].creature_id == -1) {
-    w->grid[1][x+d_x][y+d_y].creature_id = ID;
-    w->grid[1][x][y].creature_id = -1;
+  if (   0 < x+d_x && x+d_x < w->gridsize
+      && 0 < y+d_y && y+d_y < w->gridsize
+      && w->grid[w->pong][x+d_x][y+d_y].creature_id == -1) {
+    w->grid[w->pong][x+d_x][y+d_y].creature_id = ID;
+    w->grid[w->pong][x][y].creature_id = -1;
     x += d_x;
     y += d_y;
     brain.sensors[9] = 0.0; // last move not blocked

@@ -103,6 +103,11 @@ void World::advance() {
 }
 
 void World::update_creatures() {
+  //for (int i=0; i < gridsize; ++i) {
+  //  for (int j=0; j < gridsize; ++j) {
+  //    grid[pong][i][j].creature_id = grid[ping][i][j].creature_id;
+  //  }
+  //}
   for (Creature C : creatures) {
     C.advance();
   }
@@ -112,6 +117,7 @@ void World::update_plants() {
   for (int i=0; i < gridsize; ++i) {
     for (int j=0; j < gridsize; ++j) {
       grid[pong][i][j].plant = grid[ping][i][j].plant;
+      grid[pong][i][j].creature_id = grid[ping][i][j].creature_id;
     }
   }
   for (int i=0; i < gridsize; ++i) {

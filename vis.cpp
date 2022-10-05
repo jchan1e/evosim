@@ -339,25 +339,26 @@ void display()
         if (creature_id >= 0) {
           glMaterialfv(GL_FRONT, GL_SPECULAR, nonwhite);
           glMaterialfv(GL_FRONT, GL_SHININESS, dullness);
-          // color body by energy
+          // color head by energy
           float R_e = 0.75;
           float G_e = 0.75;
           float B_e = 0.75;
-          // color head by genetics
+          // color body by genetics
           float R_g = 0.7;
           float G_g = 0.5;
           float B_g = 0.3;
 
           // body
-          glColor3f(R_e, G_e, B_e);
-          ball(x, y, z, 1.0);
+          glColor3f(R_g, G_g, B_g);
+          ball(x, y, z, 0.35);
 
           // head
           // octahedron or cone or something facing forward
-          glColor3f(R_g, G_g, B_g);
+          glColor3f(R_e, G_e, B_e);
           glPushMatrix();
+          glTranslatef(x, y, z);
           glRotatef(-45*directions[step][creature_id], 0,1,0);
-          octahedron(x, y, z+1.0, 0.0, 1.0);
+          octahedron(0.0, 0.0, 0.25, 0.0, 0.25);
           glPopMatrix();
         }
 
@@ -596,6 +597,14 @@ int main(int argc, char *argv[])
     file.seekg(3*sizeof(int)); // + 2*n_boardsize*sizeof(float));
     file.read((char*)&(W->creatures[0]), n_creatures*sizeof(Creature));
 
+    // I don't like this hack, but I like storing and reading vectors I won't use even less
+    vector<Connection> conns;
+    for (int i=0; i < n_creatures; ++i) {
+      //W->creatures[i].brain.conns = {};
+      memcpy((char*)&(W->creatures[i].brain.conns),  &conns, sizeof(vector<Connection>));
+    }
+    //cout << W->creatures[0].brain.conns[0].strength << endl;
+
     unsigned int headersize = 3*sizeof(int) + n_creatures*sizeof(Creature);
     unsigned int framesize = n_boardsize*n_boardsize*sizeof(Cell) + n_creatures*sizeof(int) + n_creatures*sizeof(float);
 
@@ -650,24 +659,23 @@ int main(int argc, char *argv[])
     //glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
 
     // SANITY CHECK
-    for (int i=0; i < n_frames; ++i) {
-      for (int c=0; c < n_creatures; ++c) {
-        if (directions[i][c] < 0 || directions[i][c] >= 8)
-          cout << "directions[" << i << "][" << c << "]: " << directions[i][c] << endl;
-        if (energies[i][c] < 0 || energies[i][c] > 100)
-          cout << "energies[" << i << "][" << c << "]: " << energies[i][c] << endl;
-      }
-      for (int j=0; j < n_boardsize; ++j) {
-        for (int k=0; k < n_boardsize; ++k) {
-          Cell C = sim[i][j][k];
-          if (C.plant < 0 || C.plant > 9)
-            cout << "plant[" << i << "][" << j << "][" << k << "]: " << C.plant << endl;
-          if (C.creature_id < 0 || C.creature_id > 9)
-            cout << "creature_id[" << i << "][" << j << "][" << k << "]: " << C.creature_id << endl;
-        }
-      }
-
-    }
+    //for (int i=0; i < n_frames; ++i) {
+    //  for (int c=0; c < n_creatures; ++c) {
+    //    if (directions[i][c] < 0 || directions[i][c] >= 8)
+    //      cout << "directions[" << i << "][" << c << "]: " << directions[i][c] << endl;
+    //    if (energies[i][c] < 0 || energies[i][c] > 100)
+    //      cout << "energies[" << i << "][" << c << "]: " << energies[i][c] << endl;
+    //  }
+    //  for (int j=0; j < n_boardsize; ++j) {
+    //    for (int k=0; k < n_boardsize; ++k) {
+    //      Cell C = sim[i][j][k];
+    //      if (C.plant < 0 || C.plant > 9)
+    //        cout << "plant[" << i << "][" << j << "][" << k << "]: " << C.plant << endl;
+    //      if (C.creature_id < -1 || C.creature_id > n_creatures)
+    //        cout << "creature_id[" << i << "][" << j << "][" << k << "]: " << C.creature_id << endl;
+    //    }
+    //  }
+    //}
 
     reshape(w,h);
 
