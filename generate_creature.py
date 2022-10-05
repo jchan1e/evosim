@@ -24,6 +24,28 @@ def save(G, filename):
             outfile.write(C1b)
             outfile.write(C2b)
 
+def load(filename):
+    G = {}
+    G["b_neurons"] = []
+    G["b_actions"] = []
+    G["connections"] = []
+    with open(filename, "rb") as infile:
+        str_fmt = 'i3f10f'
+        str_len = struct.calcsize(str_fmt)
+        str_unpack = struct.Struct(str_fmt).unpack_from
+        tmp = str_unpack(infile.read(str_len))
+
+        n_conns = tmp[0]
+        G["b_neurons"] = tmp[1:4]
+        G["b_actions"] = tmp[4:14]
+        tmp2 = struct.Struct(str(n_conns*3)+'f').unpackfrom(infile.read(struct.calcsize(str(n_conns*3)+'f')))
+        for i in range(n_conns):
+            C0 = tmp2[3*i]
+            C1 = tmp2[3*i+1]
+            C2 = tmp2[3*i+2]
+            G["connections"].append((int(C0),int(C1),C2))
+    return G
+
 def generate_new(n_conns):
     G = {}
     G["b_neurons"] = []
@@ -39,10 +61,40 @@ def generate_new(n_conns):
     return G
 
 def mitosis(parent_name, n_conns):
-    pass
+    mutation_rate = 0.05 #currently static
+    G = load(parent_name)
+    for i in range(3):
+        if random.uniform(0.0,1.0) < mutation_rate:
+            G["b_neurons"][i] += random.uniform(-0.5, 0.5)
+            G["b_neurons"][i] = min(max(-4.0, G["b_neurons"][i]), 4.0)
+    for i in range(10):
+        if random.uniform(0.0,1.0) < mutation_rate:
+            G["b_actions"][i] += random.uniform(-0.5, 0.5)
+            G["b_actions"][i] = min(max(-4.0, G["b_actions"][i]), 4.0)
+    for i in range(len(G["connections"])):
+        if random.uniform(0.0,1.0) < mutation_rate:
+            C = list(G["connections"][i])
+            r = random.randrange(0,3)
+            if r != 3:
+                C[r] = random.randrange(-3, 10)
+            else:
+                C[r] += random.uniform(-0.5,0.5)
+                C[r] = min(max(-4.0, C[r]), 4.0)
+            G["connections"][i] = (C[0],C[1],C[2])
+    if random.uniform(0.0,1.0) < mutation_rate:
+        if random.randrange(0,2) == 1:
+            # add a connection
+            C0 = random.randrange(-3, 18)
+            C1 = random.randrange(-3, 10)
+            C2 = random.uniform(-4.0,4.0)
+            G["connections"].append((C0,C1,C2))
+        else:
+            # delete one at random
+            del G["connections"][random.randrange(len(G["Connections"]))]
+    return G
 
 def mate(parent_name1, parent_name2, n_conns):
-    pass
+    return None
 
 def main():
     if len(sys.argv) < 3 or len(sys.argv) > 5:
