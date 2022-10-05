@@ -8,7 +8,7 @@
 ifeq ("$(shell uname)","Darwin")
 SFLG=-Wno-deprecated-declarations $(shell sdl2-config --cflags)
 GLIBS=-framework OpenGL $(shell sdl2-config --libs)
-CLEAN=rm -rf sim vis Test *.o *.a *.dSYM
+CLEAN=rm -rf sim vis *test *.o *.a *.dSYM
 #  Linux/Unix/Solaris
 else
 SFLG=$(shell sdl2-config --cflags) -DGL_GLEXT_PROTOTYPES
@@ -16,8 +16,8 @@ GLIBS=-lGLU -lGL -lm $(shell sdl2-config --libs)
 CLEAN=rm -rf sim vis Test *.o *.a
 endif
 #endif
-CFLG=-g -O3 -Wall -std=c++11
-#CFLG=-g -Wall -std=c++11
+#CFLG=-g -O3 -Wall -std=c++11
+CFLG=-g -Wall -std=c++11
 
 compile:sim vis
 
@@ -61,14 +61,14 @@ sim:sim.o agent.o world.o
 vis:vis.o agent.o world.o objects.o
 	g++ -g -o vis $^ $(GLIBS)
 
-creature_test: creature_test.o agent.o world.o
-	g++ -g -o creature_test $^
+#creature_test: creature_test.o agent.o world.o
+#	g++ -g -o creature_test $^
 
-#Test:test.o sim vis
+#Test.o:test.o sim vis
 #	g++ -g -O3 -o Test $^ $(GLIBS)
 #
-#test:FORCE Test
-#	./Test
+#test:FORCE Test.o
+#	./Test.o
 
 FORCE:
 

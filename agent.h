@@ -81,6 +81,7 @@ public:
   float energy;
   int ID;
 
+  Creature();
   Creature(World* W, float* genome, int num_conns, int id);
   Creature(World* W, int X, int Y, int D_X, int D_Y, float E, float* genome, int len_genome, int id);
   //~Creature();

@@ -83,10 +83,14 @@ int frames = 0;
 bool reverse = false;
 
 //Simulation
+int n_creatures;
 int n_frames;
 int n_boardsize;
+//Creature* creatures = NULL;
 World* W = NULL;
 Cell*** sim = NULL;
+int** directions = NULL;
+float** energies = NULL;
 int step = 0;
 
 ////////////////////
@@ -330,29 +334,39 @@ void display()
           //  cout << "this code should not run (plant >9): (" << i << ", " << j << ")\t" << plant << endl;
         }
 
+        // draw creatures
+        int creature_id = W->grid[0][i][j].creature_id;
+        if (creature_id >= 0) {
+          glMaterialfv(GL_FRONT, GL_SPECULAR, nonwhite);
+          glMaterialfv(GL_FRONT, GL_SHININESS, dullness);
+          // color body by energy
+          float R_e = 0.75;
+          float G_e = 0.75;
+          float B_e = 0.75;
+          // color head by genetics
+          float R_g = 0.7;
+          float G_g = 0.5;
+          float B_g = 0.3;
+
+          // body
+          glColor3f(R_e, G_e, B_e);
+          ball(x, y, z, 1.0);
+
+          // head
+          // octahedron or cone or something facing forward
+          glColor3f(R_g, G_g, B_g);
+          glPushMatrix();
+          glRotatef(-45*directions[step][creature_id], 0,1,0);
+          octahedron(x, y, z+1.0, 0.0, 1.0);
+          glPopMatrix();
+        }
+
         //cout << x << "\t" << y << "\t" << z << endl;
         //ball(x,y,z, 0.5);
         //glColor3f(0.1,0.1,0.1);
       }
     }
 
-    for (Creature C : W->creatures) {
-      // color body by energy
-      float R_e = 0.5;
-      float G_e = 0.5;
-      float B_e = 0.5;
-      // color head by genetics
-      float R_g = 0.7;
-      float G_g = 0.5;
-      float B_g = 0.3;
-
-      // body
-      glColor3f(R_e, G_e, B_e);
-      ball(C.x, C.y, 0.0, 1.0);
-
-      // head
-      // octahedron or cone or something facing forward
-    }
     //cout << endl;
 
     glFlush();
@@ -561,10 +575,11 @@ int main(int argc, char *argv[])
     {
         cerr << "Could not open file: " << argv[1] << endl;
     }
-
     file.seekg(0);
-    file.read((char*)&n_boardsize, sizeof(int));
+    file.read((char*)&n_creatures, sizeof(int));
     file.seekg(sizeof(int));
+    file.read((char*)&n_boardsize, sizeof(int));
+    file.seekg(2*sizeof(int));
     file.read((char*)&n_frames, sizeof(int));
     cout << "boardsize: " << n_boardsize << endl << "frames: " << n_frames << endl;
 
@@ -573,13 +588,31 @@ int main(int argc, char *argv[])
     //file.seekg(2*sizeof(int));
     //file.read((char*)aminoList, 2*n_aminos*sizeof(float));
 
-    file.seekg(2*sizeof(int)); // + 2*n_boardsize*sizeof(float));
+    //creatures = new Creature[n_creatures];
+    float tempgenes[13];
+    for (int i=0; i < n_creatures; ++i) {
+      W->add_creature(&tempgenes[0], 0);
+    }
+    file.seekg(3*sizeof(int)); // + 2*n_boardsize*sizeof(float));
+    file.read((char*)&(W->creatures[0]), n_creatures*sizeof(Creature));
+
+    unsigned int headersize = 3*sizeof(int) + n_creatures*sizeof(Creature);
+    unsigned int framesize = n_boardsize*n_boardsize*sizeof(Cell) + n_creatures*sizeof(int) + n_creatures*sizeof(float);
+
     sim = new Cell**[n_frames];
+    directions = new int*[n_frames];
+    energies = new float*[n_frames];
     for (int i=0; i < n_frames; ++i) {
       sim[i] = new Cell* [n_boardsize];
+      directions[i] = new int[n_creatures];
+      energies[i] = new float[n_creatures];
+      file.seekg(headersize + i*framesize);
+      file.read((char*)directions[i], n_creatures*sizeof(int));
+      file.seekg(headersize + i*framesize + n_creatures*sizeof(int));
+      file.read((char*)energies[i], n_creatures*sizeof(float));
       for (int j=0; j < n_boardsize; ++j) {
         sim[i][j] = new Cell[n_boardsize];
-        file.seekg(2*sizeof(int) + n_boardsize*n_boardsize*i*sizeof(Cell) + n_boardsize*j*sizeof(Cell));
+        file.seekg(headersize + i*framesize + j*n_boardsize*sizeof(Cell) + n_creatures*(sizeof(int)+sizeof(float)));
         file.read((char*)sim[i][j], n_boardsize*sizeof(Cell));
         //if (i <= 3) {
         //for (int k=0; k < n_boardsize; ++k) {
@@ -615,6 +648,26 @@ int main(int argc, char *argv[])
     //glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     //glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
     //glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+
+    // SANITY CHECK
+    for (int i=0; i < n_frames; ++i) {
+      for (int c=0; c < n_creatures; ++c) {
+        if (directions[i][c] < 0 || directions[i][c] >= 8)
+          cout << "directions[" << i << "][" << c << "]: " << directions[i][c] << endl;
+        if (energies[i][c] < 0 || energies[i][c] > 100)
+          cout << "energies[" << i << "][" << c << "]: " << energies[i][c] << endl;
+      }
+      for (int j=0; j < n_boardsize; ++j) {
+        for (int k=0; k < n_boardsize; ++k) {
+          Cell C = sim[i][j][k];
+          if (C.plant < 0 || C.plant > 9)
+            cout << "plant[" << i << "][" << j << "][" << k << "]: " << C.plant << endl;
+          if (C.creature_id < 0 || C.creature_id > 9)
+            cout << "creature_id[" << i << "][" << j << "][" << k << "]: " << C.creature_id << endl;
+        }
+      }
+
+    }
 
     reshape(w,h);
 
@@ -652,8 +705,12 @@ int main(int argc, char *argv[])
         delete[] sim[i][j];
       }
       delete[] sim[i];
+      delete[] directions[i];
+      delete[] energies[i];
     }
     delete[] sim;
+    delete[] directions;
+    delete[] energies;
     delete W;
 
     SDL_Quit();

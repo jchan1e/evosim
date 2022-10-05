@@ -20,6 +20,7 @@ using namespace std;
 //};
 
 World::World(int size) {
+  n_creatures = 0;
   timestep = 0;
   gridsize = size;
   ping = 0;
@@ -32,6 +33,8 @@ World::World(int size) {
     for (int j=0; j < gridsize; ++j) {
       grid[ping][i][j].plant = 0; // rand() % 10;
       grid[pong][i][j].plant = grid[ping][i][j].plant;
+      grid[ping][i][j].creature_id = -1;
+      grid[pong][i][j].creature_id = -1;
     }
   }
 }
@@ -48,6 +51,7 @@ World::~World() {
 void World::add_creature(float* genome, int num_connections) {
   int ID = creatures.size();
   creatures.push_back(Creature(this, genome, num_connections, ID));
+  ++n_creatures;
 }
 
 void World::save(char* filename) {
@@ -72,10 +76,17 @@ void World::save(ofstream *file) {
   // this function is intended for progressive saves in simulation mode
   // it assumes the array size headers were already written
   if (!file->is_open())
-    cerr << "could not open file\n";
+    cerr << "file is not open\n";
   else {
     // creatures
-    file->write((char*)&creatures[0], n_creatures*sizeof(Creature));
+    int directions[n_creatures];
+    float energies[n_creatures];
+    for (int i=0; i < n_creatures; ++i) {
+      directions[i] = creatures[i].direction;
+      energies[i] = creatures[i].energy;
+    }
+    file->write((char*)&directions[0], n_creatures*sizeof(int));
+    file->write((char*)&energies[0], n_creatures*sizeof(float));
     // grid state
     for (int i=0; i < gridsize; ++i) {
       file->write((char*)grid[ping][i], gridsize*sizeof(Cell));

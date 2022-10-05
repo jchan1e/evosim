@@ -28,13 +28,13 @@ def generate_new(n_conns):
     G = {}
     G["b_neurons"] = []
     for i in range(3):
-        G["b_neurons"].append(random.uniform(0.0,4.0))
+        G["b_neurons"].append(random.uniform(-4.0,4.0))
     G["b_actions"] = []
     for i in range(10):
-        G["b_actions"].append(random.uniform(0.0,4.0))
+        G["b_actions"].append(random.uniform(-4.0,4.0))
     G["connections"] = []
     for i in range(int(n_conns)):
-        C = (random.randrange(-3,18), random.randrange(-3,10), random.uniform(0.0,4.0))
+        C = (random.randrange(-3,18), random.randrange(-3,10), random.uniform(-4.0,4.0))
         G["connections"].append(C)
     return G
 

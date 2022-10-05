@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
     int n_conns = 0;
     infile.seekg(0);
     infile.read((char*)&n_conns, sizeof(int));
-    float genome[n_conns+13];
+    float genome[13+3*n_conns];
     infile.seekg(sizeof(int));
     infile.read((char*)&genome[0], 3*sizeof(float));
     infile.seekg(sizeof(int) + 3*sizeof(float));
@@ -64,9 +64,22 @@ int main(int argc, char *argv[])
     cerr << "Could not open file: " << argv[argc-1] << endl;
     return 1;
   }
-  // begin with boardsize and first frame
+  // begin with creature count, boardsize, creature array, and first frame
+  int n_creatures = W->creatures.size();
+  file.write((char*)&n_creatures, sizeof(int));
   file.write((char*)&n_boardsize, sizeof(int));
   file.write((char*)&n_steps, sizeof(int));
+  file.write((char*)&(W->creatures[0]), n_creatures*sizeof(Creature));
+
+  //first frame
+  int directions[n_creatures];
+  float energies[n_creatures];
+  for (int i=0; i < n_creatures; ++i) {
+    directions[i] = W->creatures[i].direction;
+    energies[i] = W->creatures[i].energy;
+  }
+  file.write((char*)&directions[0], n_creatures*sizeof(int));
+  file.write((char*)&energies[0], n_creatures*sizeof(float));
   for (int i=0; i < n_boardsize; ++i) {
     file.write((char*)W->grid[W->ping][i], n_boardsize*sizeof(Cell));
   }

@@ -107,6 +107,10 @@ void Brain::eval() {
   }
 }
 
+Creature::Creature() {
+  w = NULL;
+}
+
 Creature::Creature(World* W, float* genome, int num_conns, int id) {
   w = W;
   energy = 100.0;

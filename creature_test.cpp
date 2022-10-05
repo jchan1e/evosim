@@ -29,5 +29,5 @@ int main(int argc, char *argv[]) {
     cout << (i-13)/3 << " " << genome[i] << " " << genome[i+1] << " " << genome[i+2] << endl;
   }
 
-  //W.add_creature(&genome[0], n_conns);
+  W.add_creature(&genome[0], n_conns);
 }
