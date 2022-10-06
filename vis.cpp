@@ -35,7 +35,7 @@ bool quit = false;
 
 //View Angles
 double th = 0;
-double ph = 45;
+double ph = 90;
 double dth = 0;
 double dph = 0;
 //Window Size
@@ -50,7 +50,7 @@ double ez = 0;
 double vx = 0;
 double vy = 0;
 double vz = 0;
-double zoom = 48;
+double zoom = 96;
 double dzoom = 0;
 
 //lighting arrays
@@ -679,7 +679,7 @@ int main(int argc, char *argv[])
 
     reshape(w,h);
 
-    LightPos[0] = 50.0; LightPos[1] = 50.0; LightPos[2] = 50.0; LightPos[3] = 1.0;
+    LightPos[0] = 50.0; LightPos[1] = 50.0; LightPos[2] = -100.0; LightPos[3] = 1.0;
 
     int startuptime = SDL_GetTicks();
 
