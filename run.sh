@@ -17,7 +17,7 @@ echo "Running generations $1 through $2 with $3 creatures per generation"
 #for i in {$1..$2}
 for (( i=$1; i<=$2; i++ ))
 do
-  if (( $i % 10 == 0 ))
+  if (( $i % 20 == 0 ))
   then
     zip -q creatures/gen$i.zip active_creatures/*.gene
   fi
