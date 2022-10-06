@@ -274,10 +274,10 @@ void display()
         glColor3f(r,g,b);
         glNormal3f(0,1,0);
         glBegin(GL_QUADS);
-        glVertex3f(x-0.48, 0.0, z-0.48);
-        glVertex3f(x-0.48, 0.0, z+0.48);
-        glVertex3f(x+0.48, 0.0, z+0.48);
-        glVertex3f(x+0.48, 0.0, z-0.48);
+        glVertex3f(x-0.5, 0.0, z-0.5);
+        glVertex3f(x-0.5, 0.0, z+0.5);
+        glVertex3f(x+0.5, 0.0, z+0.5);
+        glVertex3f(x+0.5, 0.0, z-0.5);
         glEnd();
 
         if (plant > 3)
