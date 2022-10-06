@@ -36,9 +36,9 @@ def load(filename):
         tmp = str_unpack(infile.read(str_len))
 
         n_conns = tmp[0]
-        G["b_neurons"] = tmp[1:4]
-        G["b_actions"] = tmp[4:14]
-        tmp2 = struct.Struct(str(n_conns*3)+'f').unpackfrom(infile.read(struct.calcsize(str(n_conns*3)+'f')))
+        G["b_neurons"] = list(tmp[1:4])
+        G["b_actions"] = list(tmp[4:14])
+        tmp2 = struct.Struct(str(n_conns*3)+'f').unpack_from(infile.read(struct.calcsize(str(n_conns*3)+'f')))
         for i in range(n_conns):
             C0 = tmp2[3*i]
             C1 = tmp2[3*i+1]
@@ -90,7 +90,7 @@ def mitosis(parent_name, n_conns):
             G["connections"].append((C0,C1,C2))
         else:
             # delete one at random
-            del G["connections"][random.randrange(len(G["Connections"]))]
+            del G["connections"][random.randrange(len(G["connections"]))]
     return G
 
 def mate(parent_name1, parent_name2, n_conns):

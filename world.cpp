@@ -49,7 +49,7 @@ World::~World() {
 }
 
 void World::add_creature(float* genome, int num_connections) {
-  int ID = creatures.size();
+  int ID = n_creatures;
   creatures.push_back(Creature(this, genome, num_connections, ID));
   ++n_creatures;
 }
@@ -103,13 +103,11 @@ void World::advance() {
 }
 
 void World::update_creatures() {
-  //for (int i=0; i < gridsize; ++i) {
-  //  for (int j=0; j < gridsize; ++j) {
-  //    grid[pong][i][j].creature_id = grid[ping][i][j].creature_id;
-  //  }
-  //}
-  for (Creature C : creatures) {
-    C.advance();
+  //for (Creature C : creatures) {
+  for (int i=0; i < n_creatures; ++i) {
+    Creature* C = &creatures[i];
+    //cout << "advancing creature: " << C->ID << endl;
+    C->advance();
   }
 }
 
@@ -124,7 +122,7 @@ void World::update_plants() {
     for (int j=0; j < gridsize; ++j) {
       Cell* C = &grid[ping][i][j];
       Cell* C_1 = &grid[pong][i][j];
-      if (rand()%8 != 0) {
+      if (rand()%16 != 0) {
         //C_1->plant = C->plant;
         continue;
       }

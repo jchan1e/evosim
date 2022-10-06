@@ -123,6 +123,11 @@ Creature::Creature(World* W, float* genome, int num_conns, int id) {
   ID = id;
   x = rand()%W->gridsize;
   y = rand()%W->gridsize;
+  while (W->grid[W->ping][x][y].creature_id > -1) {
+    x = rand()%W->gridsize;
+    y = rand()%W->gridsize;
+  }
+  W->grid[W->ping][x][y].creature_id = ID;
   direction = rand()%8;
   set_dir();
   //brain = B;
@@ -211,9 +216,9 @@ void Creature::set_dir() {
 
 
 void Creature::eat_plant(int t_x, int t_y) {
-  if (abs(t_x-x) <= 1 && abs(t_y-y) <= 1 && w->grid[1][x][y].plant > 0) {
-    w->grid[1][x][y].plant -= 1;
-    energy += 10.0;
+  if (abs(t_x-x) <= 1 && abs(t_y-y) <= 1 && w->grid[w->pong][x][y].plant > 0) {
+    energy += w->grid[w->pong][x][y].plant*10.0;
+    w->grid[w->pong][x][y].plant -= 1;
   }
 }
 
@@ -244,6 +249,7 @@ void Creature::move_forward() {
     x += d_x;
     y += d_y;
     brain.sensors[9] = 0.0; // last move not blocked
+    energy -= 0.05;
   }
   else {
     brain.sensors[9] = 1.0; // last move blocked
@@ -316,7 +322,13 @@ void Creature::advance() {
     brain.sensors[11] = 0.0;
   else
     brain.sensors[11] = 1.0;
-  brain.sensors[12] = w->grid[w->ping][x+d_x][y+d_y].plant / 9.0;
+  if (   0 <= x+d_x && x+d_x < w->gridsize
+      && 0 <= y+d_y && y+d_y < w->gridsize) {
+    brain.sensors[12] = w->grid[w->ping][x+d_x][y+d_y].plant / 9.0;
+  }
+  else {
+    brain.sensors[12] = 0.0;
+  }
   int grid[9];
   int grad0, grad1, grad2, grad3;
   for (int ix=-1; ix < 2; ++ix) {
@@ -413,6 +425,7 @@ void Creature::advance() {
   }
 
   brain.eval();
+  energy -= 0.01*brain.conns.size();
 
   // check brain outputs, determine actions to be taken
   // 0 set oscillator period [0.0, 1.0] -> [2, 60] frames per rev
@@ -458,6 +471,7 @@ void Creature::advance() {
       rotate_right();
       break;
   }
+  //cout << "E: " << energy << "\tAction: " << action_id << " " << brain.actions[action_id] << endl;
 }
 
 

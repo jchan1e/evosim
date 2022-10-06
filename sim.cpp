@@ -4,6 +4,7 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <algorithm>
 
 #include "agent.h"
 #include "world.h"
@@ -29,14 +30,14 @@ int main(int argc, char *argv[])
   // initialize
   World* W = new World(n_boardsize);
   // randomly seed plants around the board
-  W->grid[0][n_boardsize/2][n_boardsize/2].plant = 1;
-  W->grid[1][n_boardsize/2][n_boardsize/2].plant = 1;
-  //for (int i=0; i < n_boardsize/2; ++i) {
-  //  int x = rand() % n_boardsize;
-  //  int y = rand() % n_boardsize;
-  //  W->grid[0][x][y].plant = W->grid[0][x][y].plant + 1 % 10;
-  //  W->grid[1][x][y].plant = W->grid[0][x][y].plant;
-  //}
+  //W->grid[0][n_boardsize/2][n_boardsize/2].plant = 1;
+  //W->grid[1][n_boardsize/2][n_boardsize/2].plant = 1;
+  for (int i=0; i < n_boardsize/4; ++i) {
+    int x = rand() % n_boardsize;
+    int y = rand() % n_boardsize;
+    W->grid[0][x][y].plant = W->grid[0][x][y].plant + 1 % 10;
+    W->grid[1][x][y].plant = W->grid[0][x][y].plant;
+  }
 
   // initialize creatures
   for (int i=0; i < n_population; ++i) {
@@ -84,6 +85,7 @@ int main(int argc, char *argv[])
     file.write((char*)W->grid[W->ping][i], n_boardsize*sizeof(Cell));
   }
 
+
   // run the simulation
   for (int frame=1; frame < n_steps; ++frame) {
     //// update creatures
@@ -97,6 +99,51 @@ int main(int argc, char *argv[])
   }
 
   file.close();
+
+
+  // rank creatures by fitness and set aside half of them for culling
+  vector<int> passes;
+  vector<int> fails;
+  float median = 0.0;
+  vector<float> ee;
+  vector<int> ids;
+  for (Creature C : W->creatures) {
+    ee.push_back(C.energy);
+    ids.push_back(C.ID);
+  }
+  sort(ee.begin(), ee.end());
+  median = ee[n_creatures/2];
+  random_shuffle(ids.begin(), ids.end());
+  //for (Creature C : W->creatures) {
+  for (int id : ids) {
+    Creature* C = &W->creatures[id];
+    if (C->energy >= median && (int)passes.size() < n_creatures/2) {
+      passes.push_back(id);
+    }
+    else {
+      fails.push_back(id);
+    }
+  }
+  // write cull.sh script to stdout
+  cout << fixed << setprecision(2);
+  cout << "#!/bin/bash\n\n#";
+  //for (int i=0; i < argc; ++i) {
+  //  cout << argv[i] << " ";
+  //}
+  //cout << endl << endl;
+  cout << "# Energy\tGenome\n#Survivors:\n";
+  int j = 0;
+  for (int i : passes) {
+    cout << "# " << W->creatures[i].energy << "\t" << argv[5+i] << endl;
+    cout << "python3 generate_creature.py 1 " << argv[5+i] << " active_creatures/c" << j++ << ".gene" << endl;
+  }
+  cout << "\n# Culling:\n";
+  for (int i : fails) {
+    cout << "# " << W->creatures[i].energy << "\t" << argv[5+i] << endl;
+    cout << "rm " << argv[5+i] << endl;
+  }
+  cout << endl;
+
 
   delete W;
 }

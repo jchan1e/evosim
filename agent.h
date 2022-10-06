@@ -26,7 +26,6 @@ public:
   }
 };
 
-struct Brain {
   // inputs: all float values [-1.0, 1.0]
   // 0 age [0.0, 1.0]
   // 1 random generator
@@ -59,6 +58,7 @@ struct Brain {
   // 7 rotate left
   // 8 rotate right
   // 9 attack forward (disabled for now)
+struct Brain {
 public:
   float sensors[18];
   float neurons[3];
