@@ -341,7 +341,7 @@ void display()
           glMaterialfv(GL_FRONT, GL_SHININESS, dullness);
           // color head by energy
           float R_e = max(0.0, 1.0 - W->creatures[creature_id].energy/1000.0);
-          float G_e = min(1.0, W->creatures[creature_id].energy/1000.0;
+          float G_e = min(1.0, W->creatures[creature_id].energy/1000.0);
           float B_e = 0.1;
           // color body by genetics
           float R_g = 0.7;
