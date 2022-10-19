@@ -61,13 +61,18 @@ public:
 struct Brain {
 public:
   float sensors[18];
-  float neurons[3];
+  //float neurons[3];
+  vector<float> neurons;
   float actions[10];
-  float b_neurons[3];
+  //float b_neurons[3];
+  vector<float> b_neurons;
   float b_actions[10];
   vector<Connection> conns;
   float osc_freq;
+  int n_neurons;
 
+  Brain();
+  Brain(int num_neurons);
   void eval();
 };
 
@@ -82,8 +87,8 @@ public:
   int ID;
 
   Creature();
-  Creature(World* W, float* genome, int num_conns, int id);
-  Creature(World* W, int X, int Y, int D_X, int D_Y, float E, float* genome, int len_genome, int id);
+  Creature(World* W, float* genome, int num_conns, int n_neurons, int id);
+  //Creature(World* W, int X, int Y, int D_X, int D_Y, float E, float* genome, int len_genome, int id);
   //~Creature();
 
   void set_dir();
