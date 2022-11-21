@@ -216,9 +216,10 @@ void Creature::set_dir() {
 
 
 void Creature::eat_plant(int t_x, int t_y) {
-  if (abs(t_x-x) <= 1 && abs(t_y-y) <= 1 && w->grid[w->pong][x][y].plant > 0) {
-    energy += w->grid[w->pong][x][y].plant*10.0;
-    w->grid[w->pong][x][y].plant -= 1;
+  if (0 <= t_x && t_x < w->gridsize && 0 <= t_y && t_y < w->gridsize &&
+      abs(t_x-x) <= 1 && abs(t_y-y) <= 1 && w->grid[w->pong][t_x][t_y].plant > 0) {
+    energy += w->grid[w->pong][t_x][t_y].plant*5.0;
+    w->grid[w->pong][t_x][t_y].plant -= 1;
   }
 }
 
