@@ -43,9 +43,21 @@ using namespace std;
 //  // 9 attack forward (disabled for now)
 //};
 
+Brain::Brain() {
+  n_neurons = 0;
+}
+
+Brain::Brain(int num_neurons) {
+  n_neurons = num_neurons;
+  for (int i=0; i < n_neurons; ++i) {
+    neurons.push_back(0.0);
+    b_neurons.push_back(0.0);
+  }
+}
+
 void Brain::eval() {
   // reset to biases
-  for (int i=0; i < 3; ++i)
+  for (int i=0; i < n_neurons; ++i)
     neurons[i] = b_neurons[i];
   for (int i=0; i < 10; ++i)
     actions[i] = b_actions[i];
@@ -72,7 +84,7 @@ void Brain::eval() {
     }
   }
   // activation function tanh
-  for (int i=0; i < 3; ++i) {
+  for (int i=0; i < n_neurons; ++i) {
     neurons[i] = tanh(neurons[i]);
   }
 
@@ -108,6 +120,7 @@ void Brain::eval() {
 }
 
 Creature::Creature() {
+  brain = Brain(0);
   w = NULL;
   ID = -1;
   x = 0;
@@ -117,7 +130,8 @@ Creature::Creature() {
   set_dir();
 }
 
-Creature::Creature(World* W, float* genome, int num_conns, int id) {
+Creature::Creature(World* W, float* genome, int num_conns, int n_neurons, int id) {
+  brain = Brain(n_neurons);
   w = W;
   energy = 100.0;
   ID = id;
@@ -132,42 +146,44 @@ Creature::Creature(World* W, float* genome, int num_conns, int id) {
   set_dir();
   //brain = B;
   // biases first
-  for (int i=0; i < 3; ++i) {
+  brain.n_neurons = n_neurons;
+  for (int i=0; i < n_neurons; ++i) {
+    //brain.b_neurons[i] = genome[i];
     brain.b_neurons[i] = genome[i];
   }
   for (int i=0; i < 10; ++i) {
     brain.b_actions[i] = genome[3+i];
   }
   for (int i=0; i < num_conns; ++i) {
-    int I = int(genome[13+3*i]);
-    int O = int(genome[13+3*i+1]);
-    float V = genome[13+3*i+2];
+    int I = int(genome[n_neurons+10+3*i]);
+    int O = int(genome[n_neurons+10+3*i+1]);
+    float V = genome[n_neurons+10+3*i+2];
     brain.conns.push_back(Connection(I,O,V));
   }
 }
 
-Creature::Creature(World* W, int X, int Y, int D_X, int D_Y, float E, float* genome, int num_comms, int id) {
-  w = W;
-  x = X;
-  y = Y;
-  d_x = D_X;
-  d_y = D_Y;
-  energy = E;
-  ID = id;
-  //brain = B;
-  for (int i=0; i < 3; ++i) {
-    brain.b_neurons[i] = genome[i];
-  }
-  for (int i=0; i < 10; ++i) {
-    brain.b_actions[i] = genome[3+i];
-  }
-  for (int i=0; i < num_comms; ++i) {
-    int I = int(genome[3*i]);
-    int O = int(genome[3*i+1]);
-    float V = genome[3*i+2];
-    brain.conns.push_back(Connection(I,O,V));
-  }
-}
+//Creature::Creature(World* W, int X, int Y, int D_X, int D_Y, float E, float* genome, int num_comms, int id) {
+//  w = W;
+//  x = X;
+//  y = Y;
+//  d_x = D_X;
+//  d_y = D_Y;
+//  energy = E;
+//  ID = id;
+//  //brain = B;
+//  for (int i=0; i < 3; ++i) {
+//    brain.b_neurons[i] = genome[i];
+//  }
+//  for (int i=0; i < 10; ++i) {
+//    brain.b_actions[i] = genome[3+i];
+//  }
+//  for (int i=0; i < num_comms; ++i) {
+//    int I = int(genome[3*i]);
+//    int O = int(genome[3*i+1]);
+//    float V = genome[3*i+2];
+//    brain.conns.push_back(Connection(I,O,V));
+//  }
+//}
 
 //~Creature() {
 //  // clean up pointers and whatnot
