@@ -357,7 +357,7 @@ void display()
           glColor3f(R_e, G_e, B_e);
           glPushMatrix();
           glTranslatef(x, y, z);
-          glRotatef(-45*directions[step][creature_id], 0,1,0);
+          glRotatef(45*directions[step][creature_id], 0,1,0);
           octahedron(0.0, 0.0, 0.25, 0.0, 0.25);
           glPopMatrix();
         }
