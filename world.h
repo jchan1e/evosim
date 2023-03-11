@@ -39,7 +39,7 @@ public:
   World(int size);
   ~World();
 
-  void add_creature(float* genome, int num_connections);
+  void add_creature(float* genome, int num_connections, int num_neurons);
 
   void save(char* filename);
   void save(ofstream *file);

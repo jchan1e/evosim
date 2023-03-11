@@ -48,9 +48,9 @@ World::~World() {
   delete grid[pong];
 }
 
-void World::add_creature(float* genome, int num_connections) {
+void World::add_creature(float* genome, int num_connections, int num_neurons) {
   int ID = n_creatures;
-  creatures.push_back(Creature(this, genome, num_connections, ID));
+  creatures.push_back(Creature(this, genome, num_connections, num_neurons, ID));
   ++n_creatures;
 }
 

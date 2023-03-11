@@ -152,7 +152,7 @@ Creature::Creature(World* W, float* genome, int num_conns, int n_neurons, int id
     brain.b_neurons[i] = genome[i];
   }
   for (int i=0; i < 10; ++i) {
-    brain.b_actions[i] = genome[3+i];
+    brain.b_actions[i] = genome[n_neurons+i];
   }
   for (int i=0; i < num_conns; ++i) {
     int I = int(genome[n_neurons+10+3*i]);

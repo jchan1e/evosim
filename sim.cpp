@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
   // randomly seed plants around the board
   //W->grid[0][n_boardsize/2][n_boardsize/2].plant = 1;
   //W->grid[1][n_boardsize/2][n_boardsize/2].plant = 1;
-  for (int i=0; i < n_boardsize/4; ++i) {
+  for (int i=0; i < 4; ++i) {
     int x = rand() % n_boardsize;
     int y = rand() % n_boardsize;
     W->grid[0][x][y].plant = W->grid[0][x][y].plant + 1 % 10;
@@ -44,17 +44,20 @@ int main(int argc, char *argv[])
     // read file
     ifstream infile (argv[5+i], ifstream::binary);
     int n_conns = 0;
+    int n_neurons = 0;
     infile.seekg(0);
     infile.read((char*)&n_conns, sizeof(int));
-    float genome[13+3*n_conns];
     infile.seekg(sizeof(int));
+    infile.read((char*)&n_neurons, sizeof(int));
+    float genome[10 + n_neurons + 3*n_conns];
+    infile.seekg(2*sizeof(int));
     infile.read((char*)&genome[0], 3*sizeof(float));
-    infile.seekg(sizeof(int) + 3*sizeof(float));
+    infile.seekg(2*sizeof(int) + 3*sizeof(float));
     infile.read((char*)&genome[3], 10*sizeof(float));
-    infile.seekg(sizeof(int) + 13*sizeof(float));
+    infile.seekg(2*sizeof(int) + 13*sizeof(float));
     infile.read((char*)&genome[13], 3*n_conns*sizeof(float));
     // add to world
-    W->add_creature(&genome[0], n_conns);
+    W->add_creature(&genome[0], n_conns, n_neurons);
 
     infile.close();
   }
@@ -119,9 +122,11 @@ int main(int argc, char *argv[])
     Creature* C = &W->creatures[id];
     if (C->energy >= median && (int)passes.size() < n_creatures/2) {
       passes.push_back(id);
+      cerr << "pass: " << id << endl;
     }
     else {
       fails.push_back(id);
+      cerr << "fail: " << id << endl;
     }
   }
   // write cull.sh script to stdout
@@ -131,11 +136,11 @@ int main(int argc, char *argv[])
   //  cout << argv[i] << " ";
   //}
   //cout << endl << endl;
-  cout << "# Energy\tGenome\n#Survivors:\n";
+  cout << "# Energy\t\tGenome\n#Survivors:\n";
   int j = 0;
   for (int i : passes) {
     cout << "# " << W->creatures[i].energy << "\t" << argv[5+i] << endl;
-    cout << "python3 generate_creature.py 1 " << argv[5+i] << " active_creatures/c" << j++ << ".gene" << endl;
+    cout << "python3 generate_creature.py " << argv[5+i] << " active_creatures/c" << j++ << ".gene" << endl;
   }
   cout << "\n# Culling:\n";
   for (int i : fails) {

@@ -592,7 +592,7 @@ int main(int argc, char *argv[])
     //creatures = new Creature[n_creatures];
     float tempgenes[13];
     for (int i=0; i < n_creatures; ++i) {
-      W->add_creature(&tempgenes[0], 0);
+      W->add_creature(&tempgenes[0], 0, 3);
     }
     file.seekg(3*sizeof(int)); // + 2*n_boardsize*sizeof(float));
     file.read((char*)&(W->creatures[0]), n_creatures*sizeof(Creature));
