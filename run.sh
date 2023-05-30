@@ -21,9 +21,16 @@ do
   then
     zip -q creatures/gen$i.zip active_creatures/*.gene
   fi
+  echo Gen $i
   ./sim 128 $3 2000 sims/g$i.sim active_creatures/*.gene > cull.sh
-  ./cull.sh
   zip -q sims/g$i.sim.zip sims/g$i.sim && rm sims/g$i.sim &
+  #echo "CULL.SH:"
+  #cat cull.sh
+  #echo "ACTIVE_CREATURES_BEFORE:"
+  #ls active_creatures/
+  ./cull.sh
+  #echo "ACTIVE_CREATURES_AFTER:"
+  #ls active_creatures/
   for file in active_creatures/c*.gene
   do
     name=${file##*/}

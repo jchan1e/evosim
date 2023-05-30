@@ -442,7 +442,7 @@ void Creature::advance() {
   }
 
   brain.eval();
-  energy -= 0.01*brain.conns.size();
+  //energy -= 0.001*brain.conns.size();
 
   // check brain outputs, determine actions to be taken
   // 0 set oscillator period [0.0, 1.0] -> [2, 60] frames per rev

@@ -84,30 +84,40 @@ def mitosis(parent_name):
             G["b_actions"][i] += random.uniform(-0.5, 0.5)
             G["b_actions"][i] = min(max(-4.0, G["b_actions"][i]), 4.0)
     # add or remove neurons
-    if random.uniform(0.0,1.0) < mutation_rate:
+    if random.uniform(0.0,1.0) < mutation_rate: #*mutation_rate:
         if random.randrange(0,2) == 1:
             # add a neuron
             G["b_neurons"].append(random.uniform(-4.0, 4.0))
             n_neurons += 1
+            # add connections with this neuron
+            G["connections"].append((-n_neurons, random.randrange(-n_neurons,10), random.uniform(-4.0, 4.0)))
+            G["connections"].append((random.randrange(-n_neurons,18), -n_neurons, random.uniform(-4.0, 4.0)))
         else:
             # remove a neuron (and its connections) at random
             if n_neurons > 0:
                 i_n = random.randrange(len(G["b_neurons"]))
                 del G["b_neurons"][i_n]
-                G["connections"] = [conn for conn in G["connections"] if conn[0] != i_n and conn[1] != i_n]
+                G["connections"] = [conn for conn in G["connections"] if conn[0] != (-i_n-1) and conn[1] != (-i_n-1)]
+                for i in range(len(G["connections"])):
+                    conn = G["connections"][i]
+                    if conn[0] < -i_n-1:
+                        conn = (conn[0]+1, conn[1], conn[2])
+                    if conn[1] < -i_n-1:
+                        conn = (conn[0], conn[1]+1, conn[2])
+                    G["connections"][i] = conn
                 n_neurons -= 1
     # modify connections
     for i in range(len(G["connections"])):
         if random.uniform(0.0,1.0) < mutation_rate:
             C = list(G["connections"][i])
-            r = random.randrange(0,3)
-            if r != 2:
+            r = random.randrange(0,6)
+            if r < 2:
                 # change connection endpoints
                 C[r] = random.randrange(-n_neurons, 10)
             else:
                 # change connection weight
-                C[r] += random.uniform(-0.5,0.5)
-                C[r] = min(max(-4.0, C[r]), 4.0)
+                C[2] += random.uniform(-0.5,0.5)
+                C[2] = min(max(-4.0, C[2]), 4.0)
             G["connections"][i] = (C[0],C[1],C[2])
     # add or remove connections
     if random.uniform(0.0,1.0) < mutation_rate:
@@ -127,8 +137,8 @@ def mate(parent_name1, parent_name2, n_conns):
     return None
 
 def main():
-    if len(sys.argv) < 3 or len(sys.argv) > 5:
-        print("Usage: python generate_creature.py <num_connections> <num_neurons>\n       python generate_creature.py <num_connections> <parent.gene> <child.gene>")
+    if len(sys.argv) < 3 or len(sys.argv) > 5: # or sys.argv[1] not in ["new", "mitosis"]:
+        print("Usage: python generate_creature.py <num_connections> <num_neurons> <creature.gene>\n       python generate_creature.py <parent.gene> <child.gene>")
         exit(0)
 
     #elif len(sys.argv) == 3:
@@ -140,12 +150,12 @@ def main():
     #        save(mitosis(sys.argv[2], sys.argv[1]), sys.argv[-1])
 
     # generate new creature
-    elif len(sys.argv) == 3:
-        save(mitosis(sys.argv[1]), sys.argv[-1])
-
-    # parthenogenetic reproduction with mutation
     elif len(sys.argv) == 4:
         save(generate_new(int(sys.argv[1]), int(sys.argv[2])), sys.argv[-1])
+
+    # parthenogenetic reproduction with mutation
+    elif len(sys.argv) == 3:
+        save(mitosis(sys.argv[1]), sys.argv[-1])
 
     # sexual reproduction with mutation
     elif len(sys.argv) == 5:

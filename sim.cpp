@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
   for (int i=0; i < 4; ++i) {
     int x = rand() % n_boardsize;
     int y = rand() % n_boardsize;
-    W->grid[0][x][y].plant = W->grid[0][x][y].plant + 1 % 10;
+    W->grid[0][x][y].plant = W->grid[0][x][y].plant + 3 % 10;
     W->grid[1][x][y].plant = W->grid[0][x][y].plant;
   }
 
@@ -51,13 +51,23 @@ int main(int argc, char *argv[])
     infile.read((char*)&n_neurons, sizeof(int));
     float genome[10 + n_neurons + 3*n_conns];
     infile.seekg(2*sizeof(int));
-    infile.read((char*)&genome[0], 3*sizeof(float));
-    infile.seekg(2*sizeof(int) + 3*sizeof(float));
-    infile.read((char*)&genome[3], 10*sizeof(float));
-    infile.seekg(2*sizeof(int) + 13*sizeof(float));
-    infile.read((char*)&genome[13], 3*n_conns*sizeof(float));
+    infile.read((char*)&genome[0], n_neurons*sizeof(float));
+    infile.seekg(2*sizeof(int) + n_neurons*sizeof(float));
+    infile.read((char*)&genome[n_neurons], 10*sizeof(float));
+    infile.seekg(2*sizeof(int) + (10+n_neurons)*sizeof(float));
+    infile.read((char*)&genome[10+n_neurons], 3*n_conns*sizeof(float));
     // add to world
     W->add_creature(&genome[0], n_conns, n_neurons);
+
+    //cerr << argv[5+i] << endl;
+    //cerr << "n_conns: " << n_conns << endl;
+    //cerr << "n_neurons: " << n_neurons << endl;
+    //cerr << "genome:\n";
+    //cerr << genome[0];
+    //for (int g=1; g < 10 + n_neurons + 3*n_conns; ++g) {
+    //  cerr << ", " << genome[g];
+    //}
+    //cerr << endl << endl;
 
     infile.close();
   }
@@ -122,11 +132,11 @@ int main(int argc, char *argv[])
     Creature* C = &W->creatures[id];
     if (C->energy >= median && (int)passes.size() < n_creatures/2) {
       passes.push_back(id);
-      cerr << "pass: " << id << endl;
+      //cerr << "pass: " << id << endl;
     }
     else {
       fails.push_back(id);
-      cerr << "fail: " << id << endl;
+      //cerr << "fail: " << id << endl;
     }
   }
   // write cull.sh script to stdout

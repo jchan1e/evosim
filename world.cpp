@@ -122,7 +122,7 @@ void World::update_plants() {
     for (int j=0; j < gridsize; ++j) {
       Cell* C = &grid[ping][i][j];
       Cell* C_1 = &grid[pong][i][j];
-      if (rand()%16 != 0) {
+      if (rand()%64 != 0) {
         //C_1->plant = C->plant;
         continue;
       }
